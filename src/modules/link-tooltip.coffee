@@ -8,12 +8,12 @@ class LinkTooltip extends Tooltip
     maxLength: 50
     template:
      '<span class="title">Visit URL:&nbsp;</span>
-      <a href="#" class="url" target="_blank" href="about:blank"></a>
-      <input class="input" type="text">
+      <a href="#" class="url" target="_blank" href="about:blank" tabindex="-1"></a>
+      <input class="input" type="text" tabindex="-1">
       <span>&nbsp;&#45;&nbsp;</span>
-      <a href="javascript:;" class="change">Change</a>
-      <a href="javascript:;" class="remove">Remove</a>
-      <a href="javascript:;" class="done">Done</a>'
+      <a href="javascript:;" class="change" tabindex="-1">Change</a>
+      <a href="javascript:;" class="remove" tabindex="-1">Remove</a>
+      <a href="javascript:;" class="done" tabindex="-1">Done</a>'
 
   @hotkeys:
     LINK: { key: 'K', metaKey: true }

@@ -9,12 +9,12 @@ Range   = Quill.require('range')
 class ImageTooltip extends Tooltip
   @DEFAULTS:
     template:
-     '<input class="input" type="textbox">
+     '<input class="input" type="textbox" tabindex="-1">
       <div class="preview">
         <span>Preview</span>
       </div>
-      <a href="javascript:;" class="cancel">Cancel</a>
-      <a href="javascript:;" class="insert">Insert</a>'
+      <a href="javascript:;" class="cancel" tabindex="-1">Cancel</a>
+      <a href="javascript:;" class="insert" tabindex="-1">Insert</a>'
 
   constructor: (@quill, @options) ->
     @options = _.defaults(@options, Tooltip.DEFAULTS)
