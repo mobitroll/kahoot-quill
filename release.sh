@@ -4,9 +4,11 @@
 # to a branch called 'release', which is never pulled into other branches.
 # A release can then be made on GitHub from the release branch.
 
-# USAGE: $ ./release.sh 0.20.2
+# USAGE:
+# $ ./release.sh 0.20.2
 
 # check out release branch and pull latest master in
+git clean
 git checkout release
 git pull origin master
 
