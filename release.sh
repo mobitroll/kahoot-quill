@@ -15,7 +15,7 @@ git clean -f
 # generate the dist files
 grunt dist
 
-# remove lines containing 'dist' from .gitignore
+# remove lines consisting of 'dist' from .gitignore
 perl -pi.orig -e 's/\/dist\n//' .gitignore
 
 # commit and push dist files to release branch
