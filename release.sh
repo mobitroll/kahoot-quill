@@ -10,6 +10,7 @@
 # check out release branch and pull latest master in
 git checkout release
 git reset --hard origin/master
+git clean -f
 
 # generate the dist files
 grunt dist
