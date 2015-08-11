@@ -8,8 +8,8 @@
 # $ ./release.sh 0.20.2
 
 # check out release branch and pull latest master in
-git clean
 git checkout release
+git reset --hard HEAD
 git pull origin master
 
 # generate the dist files
