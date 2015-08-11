@@ -8,7 +8,26 @@ Please see the official [Quill README](https://github.com/quilljs/quill/blob/dev
 
 ## Release process
 
-TBC
+kahoot-quill is pulled into mobitroll-kahoot through the GitHub registry via jspm (see LINK). This uses GitHub release objects. In order to update the kahoot-quill code pulled into mobitroll-kahoot, therefore, we need to do a new GitHub release.
+
+### 1. Merge stage to master
+
+Create a PR from stage to master and review the changes with someone else. When you are satisfied that the changes are ready to go into production, merge the PR.
+
+### 2. Run release script
+
+Do this on your local machine, from the base kahoot-quill directory. **Please note that any uncommitted changes in the directory will be removed, as the release script runs `git clean`.**
+
+```
+./release.sh a.b.c
+```
+where `a.b.c` is the target semver release number, e.g. `0.20.2`.
+
+### 3. Create GitHub release
+
+Go to the kahoot-quill GitHub releases page at https://github.com/mobitroll/kahoot-quill/releases. 
+Click **Draft a new release** and select the tag corresponding to the target release number.
+
 
 ## Local Development of kahoot-quill
 
