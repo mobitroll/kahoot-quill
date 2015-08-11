@@ -16,7 +16,7 @@ Create a PR from stage to master and review the changes with someone else. When 
 
 ### 2. Run release script
 
-Do this on your local machine, from the base kahoot-quill directory. **Please note that any uncommitted changes in the directory will be removed, as the release script runs `git clean`.**
+Do this on your local machine, from the base kahoot-quill directory. **Please note that any uncommitted changes in the directory will be removed, as the release script runs `git reset --hard HEAD`.**
 
 ```
 ./release.sh a.b.c
