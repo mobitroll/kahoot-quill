@@ -14,7 +14,7 @@ git pull origin master
 grunt dist
 
 # remove lines containing 'dist' from .gitignore
-sed -i '' '/dist/d' ./.gitignore
+perl -pi.orig -e 's/\/dist\n//' .gitignore
 
 # commit and push dist files to release branch
 git add dist/*
@@ -26,6 +26,5 @@ echo 'tagging files with v'$1
 git tag v$1
 git push --tags
 
-
 # add /dist back to .gitignore
-echo '/dist' >> ./.gitignore
+mv .gitignore.orig .gitignore
