@@ -22,14 +22,14 @@ git diff-index --quiet HEAD || (echo 'Uncommitted/untracked changes present. Abo
 
 git checkout release
 
-# remove lines consisting of 'dist' from .gitignore
-perl -pi.orig -e 's/\/dist\n//' .gitignore
-
 # otherwise, reset to master to pull in latest src changes
 git reset --hard origin/master
 
 # pull release again so we have the history of releases
 git pull origin release
+
+# remove lines consisting of 'dist' from .gitignore
+perl -pi.orig -e 's/\/dist\n//' .gitignore
 
 # generate the dist files
 grunt dist
