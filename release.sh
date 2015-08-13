@@ -21,6 +21,7 @@ git checkout release
 
 # remove lines consisting of 'dist' from .gitignore
 perl -pi.orig -e 's/\/dist\n//' .gitignore
+echo '.gitignore' >> .gitignore
 
 # check whether we have uncommitted/untracked changes and abort if so
 git diff-index --quiet origin/master || echo 'Uncommitted/untracked changes present. Aborting release.' && exit 1
