@@ -7,10 +7,13 @@
 # USAGE:
 # $ ./release.sh 0.20.2
 
+# abort script if something errors
+set -e
+
 # check out release branch and pull latest master in
 git checkout release
 git reset --hard origin/master
-git clean -f
+git diff-index origin/master
 
 # generate the dist files
 grunt dist
