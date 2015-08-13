@@ -16,7 +16,7 @@ class Keyboard
     UNDERLINE:  { key: 'U',          metaKey: true }
 
   constructor: (@quill, options) ->
-    @options = _.defaults(options, Keyboard.DEFAULTS)
+    @options = _.defaults(options, @DEFAULTS)
     @hotkeys = {}
     this._initListeners()
     this._initHotkeys()
