@@ -17,14 +17,13 @@ else
   exit 1
 fi
 
+# check whether we have uncommitted/untracked changes and abort if so
+git diff-index --quiet HEAD || echo 'Uncommitted/untracked changes present. Aborting release.' && exit 1
+
 git checkout release
 
 # remove lines consisting of 'dist' from .gitignore
 perl -pi.orig -e 's/\/dist\n//' .gitignore
-echo '.gitignore' >> .gitignore
-
-# check whether we have uncommitted/untracked changes and abort if so
-git diff-index --quiet origin/master || echo 'Uncommitted/untracked changes present. Aborting release.' && exit 1
 
 # otherwise, reset to master to pull in latest src changes
 git reset --hard origin/master
