@@ -17,15 +17,16 @@ else
   exit 1
 fi
 
-# check out release branch and pull latest master in
 git checkout release
+
+# check whether we have uncommitted/untracked changes and abort if so
+git diff-index --quiet origin/master || echo 'Uncommitted/untracked changes present. Aborting release.' && exit 1
+
+# otherwise, reset to master to pull in latest src changes
 git reset --hard origin/master
 
 # pull release again so we have the history of releases
 git pull origin release
-
-# check whether we have uncommitted/untracked changes and abort if so
-git diff-index --quiet origin/master || echo 'Uncommitted/untracked changes present. Aborting release.' && exit 1
 
 # generate the dist files
 grunt dist
