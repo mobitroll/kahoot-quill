@@ -13,6 +13,11 @@ set -e
 # check out release branch and pull latest master in
 git checkout release
 git reset --hard origin/master
+
+# pull release again so we have the history of releases
+git pull origin release
+
+# check whether we have uncommitted/untracked changes and abort if so
 git diff-index origin/master
 
 # generate the dist files
