@@ -36,7 +36,7 @@ grunt dist
 
 # commit and push dist files to release branch
 git add dist/*
-git commit -m 'Release '$1
+git commit -m 'Release '$1 || (echo 'No changes to dist files. Aborting release.' && exit 1)
 git push origin release
 
 # tag the files and push tags
