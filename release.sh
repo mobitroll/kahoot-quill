@@ -18,7 +18,7 @@ git reset --hard origin/master
 git pull origin release
 
 # check whether we have uncommitted/untracked changes and abort if so
-git diff-index --quiet origin/master || echo 'git diff-index exited with code '$?
+git diff-index --quiet origin/master || echo 'Uncommitted/untracked changes present. Aborting release.' && exit 1
 
 # generate the dist files
 grunt dist
