@@ -19,6 +19,7 @@ git pull origin release
 
 # check whether we have uncommitted/untracked changes and abort if so
 git diff-index --quiet origin/master
+echo 'git diff-index exited with code '$?
 
 # generate the dist files
 grunt dist
