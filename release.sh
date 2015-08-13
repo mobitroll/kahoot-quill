@@ -10,6 +10,13 @@
 # abort script if something errors
 set -e
 
+if [[ $1 =~ ^[0-9]+.[0-9]+.[0-9]+$ ]]; then
+  echo 'Version number' $1 'valid. Continuing...'
+else
+  echo 'Usage: ./release.sh 0.20.2'
+  exit 1
+fi
+
 # check out release branch and pull latest master in
 git checkout release
 git reset --hard origin/master
