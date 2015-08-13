@@ -18,7 +18,7 @@ else
 fi
 
 # check whether we have uncommitted/untracked changes and abort if so
-git diff-index --quiet HEAD || echo 'Uncommitted/untracked changes present. Aborting release.' && exit 1
+git diff-index --quiet HEAD || (echo 'Uncommitted/untracked changes present. Aborting release.' && exit 1)
 
 git checkout release
 
