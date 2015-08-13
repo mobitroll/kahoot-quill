@@ -22,11 +22,11 @@ git diff-index --quiet HEAD || (echo 'Uncommitted/untracked changes present. Abo
 
 git checkout release
 
-# otherwise, reset to master to pull in latest src changes
-git reset --hard origin/master
+# otherwise, reset to origin so we have the history of releases
+git reset origin/release
 
-# pull release again so we have the history of releases
-git pull origin release
+# pull in latest src changes from master
+git pull origin master
 
 # remove lines consisting of 'dist' from .gitignore
 perl -pi.orig -e 's/\/dist\n//' .gitignore
