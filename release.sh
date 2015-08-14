@@ -46,3 +46,5 @@ git push --tags
 
 # add /dist back to .gitignore
 mv .gitignore.orig .gitignore
+
+echo 'Success! Now go to GitHub and create the release.'
