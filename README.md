@@ -6,9 +6,34 @@ To get started with Quill, check out the [Github Page](http://quilljs.com/) or j
 
 Please see the official [Quill README](https://github.com/quilljs/quill/blob/develop/README.md) for more information about the base project and its development.
 
+## Development process
+
+To add a new feature to kahoot-quill, follow these steps.
+
+### 1. Create a feature branch from stage
+
+```
+git checkout stage
+git pull origin stage
+git checkout -b JIRA-9999-feature-name
+```
+
+### 2. Make changes
+
+Make changes to the code. See [Local development of kahoot-quill](https://github.com/mobitroll/kahoot-quill#local-development-of-kahoot-quill) below for how to install and build the code.
+
+### 3. Run automated tests
+
+Run the [tests](https://github.com/mobitroll/kahoot-quill#testing) on your local machine. This is essential as we currently do not run the tests automatically at any point. We are [considering]() integrating Travis CI into PRs in the future.
+
+### 4. Make a pull request to stage
+
+Commit and push your branch, then go to GitHub and make a pull request from your branch to the stage branch. **N.B. By default the selected base branch will be quilljs/quill:develop. Make sure you switch to mobitroll/kahoot-quill:stage!**
+
+
 ## Release process
 
-kahoot-quill is pulled into mobitroll-kahoot through the GitHub registry via jspm (see LINK). This uses GitHub release objects. In order to update the kahoot-quill code pulled into mobitroll-kahoot, therefore, we need to do a new GitHub release.
+kahoot-quill is pulled into mobitroll-kahoot through the GitHub registry via jspm (see LINK). This uses GitHub release objects. In order to update the kahoot-quill code pulled into mobitroll-kahoot, therefore, we need to do a new GitHub release. There is no fixed schedule: these releases can be done as needed.
 
 ### 1. Merge stage to master
 
@@ -60,6 +85,10 @@ With the local server (`grunt server`) running you can try out some minimal exam
     grunt test:coverage - run tests measuring coverage with Chrome
 
 Tests are run by [Karma](http://karma-runner.github.io/) and [Protractor](https://github.com/angular/protractor) using [Jasmine](http://jasmine.github.io/). Check out `Gruntfile.coffee` and `config/grunt/` for more testing options.
+
+## Issues/todos
+
+- Integrate Travis CI into pull requests (as in base repo)
 
 ## License
 
