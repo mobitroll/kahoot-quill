@@ -28,7 +28,7 @@ git reset origin/release
 # pull in latest src changes from master
 git pull origin master
 
-# remove lines consisting of 'dist' from .gitignore
+# remove lines consisting of '/dist' from .gitignore
 perl -pi.orig -e 's/\/dist\n//' .gitignore
 
 # generate the dist files
