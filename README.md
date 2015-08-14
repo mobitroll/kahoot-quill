@@ -16,12 +16,14 @@ Create a PR from stage to master and review the changes with someone else. When 
 
 ### 2. Run release script
 
-Do this on your local machine, from the base kahoot-quill directory. **Please note that any uncommitted changes in the directory will be removed, as the release script runs `git reset --hard HEAD`.**
+Do this on your local machine, from the base kahoot-quill directory. The script requires perl. Make sure you've committed/stashed any work before running the script.
 
 ```
 ./release.sh a.b.c
 ```
 where `a.b.c` is the target semver release number, e.g. `0.20.2`.
+
+The script will abort if certain conditions are not met: for example, if your working directory is not clean when you run the script, or if there are no changes to the dist files after compiling. Make sure it has exited successfully before continuing.
 
 ### 3. Create GitHub release
 
