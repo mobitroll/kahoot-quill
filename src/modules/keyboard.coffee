@@ -5,6 +5,9 @@ Delta  = Quill.require('delta')
 
 
 class Keyboard
+  @DEFAULTS:
+    'tabToIndent': true
+
   @hotkeys:
     BOLD:       { key: 'B',          metaKey: true }
     INDENT:     { key: dom.KEYS.TAB }
@@ -13,12 +16,15 @@ class Keyboard
     UNDERLINE:  { key: 'U',          metaKey: true }
 
   constructor: (@quill, options) ->
+    @options = _.defaults(options, @DEFAULTS)
     @hotkeys = {}
     this._initListeners()
     this._initHotkeys()
     @quill.onModuleLoad('toolbar', (toolbar) =>
       @toolbar = toolbar
     )
+    if !@options.tabToIndent
+      delete @hotkeys[dom.KEYS.TAB]
 
   addHotkey: (hotkeys, callback) ->
     hotkeys = [hotkeys] unless Array.isArray(hotkeys)
@@ -92,13 +98,13 @@ class Keyboard
     )
     _.each(['bold', 'italic', 'underline'], (format) =>
       this.addHotkey(Keyboard.hotkeys[format.toUpperCase()], (range) =>
-        this.toggleFormat(range, format)
+        if (@quill.options.formats.indexOf(format) > -1)
+          this.toggleFormat(range, format)
         return false
       )
     )
     this._initDeletes()
     this._initEnter()
-
   _initListeners: ->
     dom(@quill.root).on('keydown', (event) =>
       prevent = false
