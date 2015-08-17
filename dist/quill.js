@@ -6469,6 +6469,14 @@ Format = (function() {
       tag: 'S',
       prepare: 'strikeThrough'
     },
+    superscript: {
+      tag: 'SUP',
+      prepare: 'superscript'
+    },
+    subscript: {
+      tag: 'SUB',
+      prepare: 'subscript'
+    },
     color: {
       style: 'color',
       "default": 'rgb(0, 0, 0)',
@@ -8789,6 +8797,10 @@ dom = Quill.require('dom');
 Delta = Quill.require('delta');
 
 Keyboard = (function() {
+  Keyboard.DEFAULTS = {
+    'tabToIndent': true
+  };
+
   Keyboard.hotkeys = {
     BOLD: {
       key: 'B',
@@ -8813,6 +8825,7 @@ Keyboard = (function() {
 
   function Keyboard(quill, options) {
     this.quill = quill;
+    this.options = _.defaults(options, this.DEFAULTS);
     this.hotkeys = {};
     this._initListeners();
     this._initHotkeys();
@@ -8821,6 +8834,9 @@ Keyboard = (function() {
         return _this.toolbar = toolbar;
       };
     })(this));
+    if (!this.options.tabToIndent) {
+      delete this.hotkeys[dom.KEYS.TAB];
+    }
   }
 
   Keyboard.prototype.addHotkey = function(hotkeys, callback) {
@@ -8936,7 +8952,9 @@ Keyboard = (function() {
     _.each(['bold', 'italic', 'underline'], (function(_this) {
       return function(format) {
         return _this.addHotkey(Keyboard.hotkeys[format.toUpperCase()], function(range) {
-          _this.toggleFormat(range, format);
+          if (_this.quill.options.formats.indexOf(format) > -1) {
+            _this.toggleFormat(range, format);
+          }
           return false;
         });
       };
@@ -9388,6 +9406,7 @@ PasteManager = (function() {
     this._onConvert = bind(this._onConvert, this);
     this.container = this.quill.addContainer('ql-paste-manager');
     this.container.setAttribute('contenteditable', true);
+    this.container.setAttribute('tabindex', '-1');
     dom(this.quill.root).on('paste', _.bind(this._paste, this));
     this.options = _.defaults(options, PasteManager.DEFAULTS);
     if ((base = this.options).onConvert == null) {
@@ -9484,7 +9503,9 @@ Toolbar = (function() {
       'link': 'link',
       'list': 'list',
       'strike': 'strike',
-      'underline': 'underline'
+      'underline': 'underline',
+      'superscript': 'superscript',
+      'subscript': 'subscript'
     },
     TOOLTIP: {
       'image': 'image',
@@ -9873,12 +9894,20 @@ UndoManager = (function() {
   UndoManager.prototype.initListeners = function() {
     this.quill.onModuleLoad('keyboard', (function(_this) {
       return function(keyboard) {
+        var redoKey;
         keyboard.addHotkey(UndoManager.hotkeys.UNDO, function() {
           _this.quill.editor.checkUpdate();
           _this.undo();
           return false;
         });
-        return keyboard.addHotkey(UndoManager.hotkeys.REDO, function() {
+        redoKey = [UndoManager.hotkeys.REDO];
+        if (navigator.platform.indexOf('Win') > -1) {
+          redoKey.push({
+            key: 'Y',
+            metaKey: true
+          });
+        }
+        return keyboard.addHotkey(redoKey, function() {
           _this.quill.editor.checkUpdate();
           _this.redo();
           return false;
@@ -10046,7 +10075,7 @@ Quill = (function(superClass) {
   Quill.themes = [];
 
   Quill.DEFAULTS = {
-    formats: ['align', 'bold', 'italic', 'strike', 'underline', 'color', 'background', 'font', 'size', 'link', 'image', 'bullet', 'list'],
+    formats: ['align', 'bold', 'italic', 'strike', 'underline', 'superscript', 'subscript', 'color', 'background', 'font', 'size', 'link', 'image', 'bullet', 'list'],
     modules: {
       'keyboard': true,
       'paste-manager': true,
