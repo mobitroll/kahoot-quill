@@ -86,6 +86,13 @@ With the local server (`grunt server`) running you can try out some minimal exam
 
 Tests are run by [Karma](http://karma-runner.github.io/) and [Protractor](https://github.com/angular/protractor) using [Jasmine](http://jasmine.github.io/). Check out `Gruntfile.coffee` and `config/grunt/` for more testing options.
 
+#### Troubleshooting
+
+If `grunt test:e2e` fails with the error `No selenium server jar found at the specified location`, try running the following command in the base kahoot-quill directory:
+
+    node node_modules/protractor/bin/webdriver-manager update
+Then run `grunt test:e2e` again.
+
 ## Issues/todos
 
 - Integrate Travis CI into pull requests (as in base repo)
