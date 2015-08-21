@@ -8798,7 +8798,8 @@ Delta = Quill.require('delta');
 
 Keyboard = (function() {
   Keyboard.DEFAULTS = {
-    'tabToIndent': true
+    'tabToIndent': true,
+    'disableEnter': false
   };
 
   Keyboard.hotkeys = {
@@ -8893,19 +8894,21 @@ Keyboard = (function() {
     return this.addHotkey(keys, (function(_this) {
       return function(range, hotkey) {
         var delta, leaf, line, offset, ref, ref1;
-        if (range == null) {
-          return true;
-        }
-        ref = _this.quill.editor.doc.findLineAt(range.start), line = ref[0], offset = ref[1];
-        ref1 = line.findLeafAt(offset), leaf = ref1[0], offset = ref1[1];
-        delta = new Delta().retain(range.start).insert('\n', line.formats)["delete"](range.end - range.start);
-        _this.quill.updateContents(delta, Quill.sources.USER);
-        _.each(leaf.formats, function(value, format) {
-          _this.quill.prepareFormat(format, value);
-          if (_this.toolbar != null) {
-            _this.toolbar.setActive(format, value);
+        if (!_this.options.disableEnter) {
+          if (range == null) {
+            return true;
           }
-        });
+          ref = _this.quill.editor.doc.findLineAt(range.start), line = ref[0], offset = ref[1];
+          ref1 = line.findLeafAt(offset), leaf = ref1[0], offset = ref1[1];
+          delta = new Delta().retain(range.start).insert('\n', line.formats)["delete"](range.end - range.start);
+          _this.quill.updateContents(delta, Quill.sources.USER);
+          _.each(leaf.formats, function(value, format) {
+            _this.quill.prepareFormat(format, value);
+            if (_this.toolbar != null) {
+              _this.toolbar.setActive(format, value);
+            }
+          });
+        }
         return false;
       };
     })(this));
