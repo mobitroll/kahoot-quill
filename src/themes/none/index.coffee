@@ -1,7 +1,7 @@
-_ = require('lodash')
 dom = require('../../lib/dom')
 
 class BaseTheme
+  @OPTIONS: {}
 
   constructor: (@quill, @options) ->
     dom(@quill.container).addClass('ql-container')
