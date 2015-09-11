@@ -78,6 +78,7 @@ describe('Keyboard', ->
       dom(@quill.root).trigger('keydown', { key: dom.KEYS.ENTER })
 
       expect(dom($('.ql-bold').get(0)).hasClass('ql-active')).toBe(true)
+      expect(dom($('.ql-bold').get(0)).hasClass('is-active')).toBe(true)
       expect(dom($('.ql-size').get(0)).value()).toBe(size)
     )
   )

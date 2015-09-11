@@ -78,6 +78,7 @@ class Toolbar
       @triggering = false
     else
       $input.toggleClass('ql-active', value or false)
+      $input.toggleClass('is-active', value or false)
 
   updateActive: (range, formats = null) ->
     range or= @quill.getSelection()
