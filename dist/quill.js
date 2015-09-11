@@ -9630,7 +9630,8 @@ Toolbar = (function() {
       }
       return this.triggering = false;
     } else {
-      return $input.toggleClass('ql-active', value || false);
+      $input.toggleClass('ql-active', value || false);
+      return $input.toggleClass('is-active', value || false);
     }
   };
 
