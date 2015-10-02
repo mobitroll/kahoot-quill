@@ -81,7 +81,7 @@ class Quill extends EventEmitter2
       this.addModule(name, option)
     )
     dom(@root).on('focus', @options.onFocus) if @options.onFocus
-    dom(@root).on('blur', @options.onBlur) if @options.onFocus
+    dom(@root).on('blur', @options.onBlur) if @options.onBlur
 
   destroy: ->
     html = this.getHTML()
