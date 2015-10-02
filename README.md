@@ -26,9 +26,10 @@ Make changes to the code. See [Local development of kahoot-quill](https://github
 
 Run the [tests](https://github.com/mobitroll/kahoot-quill#testing) on your local machine. This is essential as we currently do not run the tests automatically at any point. We are [considering]() integrating Travis CI into PRs in the future.
 
-### 4. Make a pull request to stage
+### 4. Make a pull request to stage and merge
 
 Commit and push your branch, then go to GitHub and make a pull request from your branch to the stage branch. **N.B. By default the selected base branch will be quilljs/quill:develop. Make sure you switch to mobitroll/kahoot-quill:stage!**
+Review the PR with someone, then merge it to stage when ready.
 
 
 ## Release process
