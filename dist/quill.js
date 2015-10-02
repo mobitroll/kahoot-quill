@@ -10088,7 +10088,9 @@ Quill = (function(superClass) {
     pollInterval: 100,
     readOnly: false,
     styles: {},
-    theme: 'base'
+    theme: 'base',
+    onFocus: false,
+    onBlur: false
   };
 
   Quill.events = {
@@ -10170,6 +10172,12 @@ Quill = (function(superClass) {
         return _this.addModule(name, option);
       };
     })(this));
+    if (this.options.onFocus) {
+      dom(this.root).on('focus', this.options.onFocus);
+    }
+    if (this.options.onBlur) {
+      dom(this.root).on('blur', this.options.onBlur);
+    }
   }
 
   Quill.prototype.destroy = function() {
