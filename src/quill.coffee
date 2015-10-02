@@ -26,7 +26,9 @@ class Quill extends EventEmitter2
     pollInterval: 100
     readOnly: false
     styles: {}
-    theme: 'base'
+    theme: 'base',
+    onFocus: false,
+    onBlur: false
 
   @events:
     FORMAT_INIT      : 'format-init'
@@ -78,6 +80,8 @@ class Quill extends EventEmitter2
     _.each(@options.modules, (option, name) =>
       this.addModule(name, option)
     )
+    dom(@root).on('focus', @options.onFocus) if @options.onFocus
+    dom(@root).on('blur', @options.onBlur) if @options.onBlur
 
   destroy: ->
     html = this.getHTML()
