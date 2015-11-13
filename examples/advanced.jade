@@ -29,6 +29,8 @@ html
           button.ql-bold(title='Bold') Bold
           button.ql-italic(title='Italic') Italic
           button.ql-underline(title='Underline') Under
+          button.ql-superscript(title='Superscript') Sup
+          button.ql-subscript(title='Subscript') Sub
           button.ql-list(title='List') List
         .editor-container
 
@@ -50,6 +52,10 @@ html
             span.ql-format-button.ql-italic(title='Italic')
             span.ql-format-separator
             span.ql-format-button.ql-underline(title='Underline')
+            span.ql-format-separator
+            span.ql-format-button.ql-superscript(title='Superscript') Sup
+            span.ql-format-separator
+            span.ql-format-button.ql-subscript(title='Subscript') Sub
           span.ql-format-group
             each c in ['ql-color', 'ql-background']
               select(class=c, title=(c=='ql-color'?'Text Color':'Background Color'))
