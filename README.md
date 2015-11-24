@@ -97,6 +97,7 @@ Then run `grunt test:e2e` again.
 ## Issues/todos
 
 - Integrate Travis CI into pull requests (as in base repo)
+- Develop strategy for merging in upstream changes
 
 ## License
 
