@@ -98,6 +98,7 @@ Then run `grunt test:e2e` again.
 
 - Integrate Travis CI into pull requests (as in base repo)
 - Develop strategy for merging in upstream changes
+- Run tests automatically in release script
 
 ## License
 
