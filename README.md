@@ -49,6 +49,8 @@ Do this on your local machine, from the base kahoot-quill directory. The script 
 ```
 where `a.b.c` is the target semver release number, e.g. `0.20.2`.
 
+Accept the default commit message when vim comes up.
+
 The script will abort if certain conditions are not met: for example, if your working directory is not clean when you run the script, or if there are no changes to the dist files after compiling. Make sure it has exited successfully before continuing.
 
 ### 3. Create GitHub release
@@ -99,6 +101,7 @@ Then run `grunt test:e2e` again.
 - Integrate Travis CI into pull requests (as in base repo)
 - Develop strategy for merging in upstream changes
 - Run tests automatically in release script
+- Accept default commit message in release script so user doesn't have to quit vim
 
 ## License
 
