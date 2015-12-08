@@ -9,6 +9,16 @@ describe('Format', ->
       existing: '<b>Text</b>'
       missing: 'Text'
       value: true
+    superscript: 
+      format: new Quill.Format(Quill.Format.FORMATS.superscript)
+      existing: '<sup>Text</sup>',
+      missing: 'Text',
+      value: true
+    subscript: 
+      format: new Quill.Format(Quill.Format.FORMATS.subscript)
+      existing: '<sub>Text</sub>',
+      missing: 'Text',
+      value: true
     style:
       format: new Quill.Format(Quill.Format.FORMATS.color)
       existing: '<span style="color: blue;">Text</span>'
