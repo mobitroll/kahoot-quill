@@ -39,6 +39,28 @@ describe('Editing text', ->
     browser.call( -> )
   )
 
+  it('superscript', ->
+    preNormalText = 'The Whale'
+    superscriptedText = 'Superscripted'
+    postNormalText = 'Normal again'
+    element(By.css('.ql-superscript')).click()
+    updateEditor()
+    editor.sendKeys(superscriptedText)
+    updateEditor()
+    element(By.css('.ql-superscript')).click()
+    updateEditor()
+    editor.sendKeys(postNormalText)
+    updateEditor()
+    firstLine = element.all(By.css('.ql-editor div')).first()
+    expect(firstLine.getOuterHtml()).toEqual(
+      "<div>#{preNormalText}<sup>#{superscriptedText}</sup>#{postNormalText}</div>"
+    )
+    [1..(superscriptedText.length + postNormalText.length)].forEach( ->
+      editor.sendKeys(protractor.Key.BACK_SPACE)
+    )
+    browser.call( -> )
+  )
+
   it('enter', ->
     editor.sendKeys(protractor.Key.RETURN)
     expectedDelta = { ops: [{ retain: 9 }, { insert: '\n' }] }
