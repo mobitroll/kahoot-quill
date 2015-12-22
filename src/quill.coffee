@@ -28,7 +28,8 @@ class Quill extends EventEmitter2
     styles: {}
     theme: 'base',
     onFocus: false,
-    onBlur: false
+    onBlur: false,
+    sanitiseHtml: _.noop
 
   @events:
     FORMAT_INIT      : 'format-init'
