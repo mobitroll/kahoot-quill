@@ -61,7 +61,7 @@ class Editor
       )
       @delta = @doc.toDelta()
       @length = @delta.length()
-      @innerHTML = @root.innerHTML = @options.sanitiseHtml(@root.innerHTML)
+      @innerHTML = @root.innerHTML
       @quill.emit(@quill.constructor.events.TEXT_CHANGE, delta, source) if delta and source != Editor.sources.SILENT
     if localDelta and localDelta.ops.length > 0 and source != Editor.sources.SILENT
       @quill.emit(@quill.constructor.events.TEXT_CHANGE, localDelta, Editor.sources.USER)
