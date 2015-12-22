@@ -28,8 +28,7 @@ class Quill extends EventEmitter2
     styles: {}
     theme: 'base',
     onFocus: false,
-    onBlur: false,
-    sanitiseHtml: _.noop
+    onBlur: false
 
   @events:
     FORMAT_INIT      : 'format-init'
@@ -231,7 +230,11 @@ class Quill extends EventEmitter2
   updateContents: (delta, source = Quill.sources.API) ->
     delta = { ops: delta } if Array.isArray(delta)
     @editor.applyDelta(delta, source)
-    @root.innerHTML = @options.sanitiseHtml(@root.innerHTML)
+    this._sanitiseHtml()
+
+  _sanitiseHtml: () ->
+    if (_.isFunction(@options.sanitiseHtml))
+      @root.innerHTML = @options.sanitiseHtml(@root.innerHTML)
 
   # fn(Number start, Number end, String name, String value, String source)
   # fn(Number start, Number end, Object formats, String source)
