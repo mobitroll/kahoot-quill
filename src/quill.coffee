@@ -230,6 +230,11 @@ class Quill extends EventEmitter2
   updateContents: (delta, source = Quill.sources.API) ->
     delta = { ops: delta } if Array.isArray(delta)
     @editor.applyDelta(delta, source)
+    this._sanitiseHtml()
+
+  _sanitiseHtml: () ->
+    if (_.isFunction(@options.sanitiseHtml))
+      @root.innerHTML = @options.sanitiseHtml(@root.innerHTML)
 
   # fn(Number start, Number end, String name, String value, String source)
   # fn(Number start, Number end, Object formats, String source)

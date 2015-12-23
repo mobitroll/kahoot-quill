@@ -96,6 +96,25 @@ If `grunt test:e2e` fails with the error `No selenium server jar found at the sp
     node node_modules/protractor/bin/webdriver-manager update
 Then run `grunt test:e2e` again.
 
+### Linking kahoot-quill into mobitroll-kahoot
+
+If you want to develop on kahoot-quill live within the vagrant development environment of mobitroll-kahoot/builder, you'll have to use jspm linking.
+
+First in the checked out kahoot-quill repository, create a local link to "mobitroll/kahoot-quill@x.y.z".
+	
+	jspm link npm:mobitroll/kahoot-quill@x.y.z
+
+Then in mobitroll-kahoot/builder, install the link:
+
+	jspm install --link npm:mobitroll/kahoot-quill@x.y.z
+
+This will create a symlink in mobitroll-kahoot/builder/jspm_packages/npm/kahoot-quill@x.y.z to the kahoot-quill directory. The problem is that the symlink is created with an absolute path and will fail to be served from within vagrant (unless you use jspm inside vagrant). The not-so-pretty solution to this is to override the symlink inside vagrant:
+
+	vagrant ssh
+	ln -s /home/sync_dir/kahoot-quill /home/sync_dir/mobitroll-kahoot/builder/jspm_packages/npm/mobitroll/kahoot-quill@x.y.z
+
+
+
 ## Issues/todos
 
 - Integrate Travis CI into pull requests (as in base repo)
