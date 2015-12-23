@@ -10593,7 +10593,14 @@ Quill = (function(superClass) {
         ops: delta
       };
     }
-    return this.editor.applyDelta(delta, source);
+    this.editor.applyDelta(delta, source);
+    return this._sanitiseHtml();
+  };
+
+  Quill.prototype._sanitiseHtml = function() {
+    if (_.isFunction(this.options.sanitiseHtml)) {
+      return this.root.innerHTML = this.options.sanitiseHtml(this.root.innerHTML);
+    }
   };
 
   Quill.prototype._buildParams = function() {
