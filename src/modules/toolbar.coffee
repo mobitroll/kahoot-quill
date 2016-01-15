@@ -46,7 +46,7 @@ class Toolbar
       selector = "select#{selector}"    # Avoid selecting the picker container
       eventName = 'change'
     else
-      eventName = 'click'
+      eventName = 'mousedown'
     input = @container.querySelector(selector)
     return unless input?
     @inputs[format] = input
