@@ -24,7 +24,7 @@ Make changes to the code. See [Local development of kahoot-quill](https://github
 
 ### 3. Run automated tests
 
-Run the [tests](https://github.com/mobitroll/kahoot-quill#testing) on your local machine. This is essential as we currently do not run the tests automatically at any point. We are [considering]() integrating Travis CI into PRs in the future.
+Run the [tests](https://github.com/mobitroll/kahoot-quill#testing) on your local machine. This is essential as we currently do not run the tests automatically at any point. We are running builds on [TravisCI](https://travis-ci.org/mobitroll/kahoot-quill) experimentally, and this will be built into the process in the future. Right now you can see the build status on pull requests.
 
 ### 4. Make a pull request to stage and merge
 
