@@ -1,5 +1,7 @@
 # kahoot-quill
 
+[![Build Status](https://travis-ci.org/mobitroll/kahoot-quill.svg?branch=stage)](https://travis-ci.org/mobitroll/kahoot-quill)
+
 This repo is a fork of [Quill](https://github.com/quilljs/quill), a modern rich text editor built for compatibility and extensibility. It was created by [Jason Chen](https://twitter.com/jhchen) and [Byron Milligan](https://twitter.com/byronmilligan) and open sourced by [Salesforce.com](http://www.salesforce.com).
 
 To get started with Quill, check out the [Github Page](http://quilljs.com/) or jump straight into the [demo](http://quilljs.com/examples/).
