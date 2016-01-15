@@ -1,5 +1,7 @@
 # kahoot-quill
 
+[![Build Status](https://travis-ci.org/mobitroll/kahoot-quill.svg?branch=stage)](https://travis-ci.org/mobitroll/kahoot-quill)
+
 This repo is a fork of [Quill](https://github.com/quilljs/quill), a modern rich text editor built for compatibility and extensibility. It was created by [Jason Chen](https://twitter.com/jhchen) and [Byron Milligan](https://twitter.com/byronmilligan) and open sourced by [Salesforce.com](http://www.salesforce.com).
 
 To get started with Quill, check out the [Github Page](http://quilljs.com/) or jump straight into the [demo](http://quilljs.com/examples/).
@@ -24,7 +26,7 @@ Make changes to the code. See [Local development of kahoot-quill](https://github
 
 ### 3. Run automated tests
 
-Run the [tests](https://github.com/mobitroll/kahoot-quill#testing) on your local machine. This is essential as we currently do not run the tests automatically at any point. We are [considering]() integrating Travis CI into PRs in the future.
+Run the [tests](https://github.com/mobitroll/kahoot-quill#testing) on your local machine. This is essential as we currently do not run the tests automatically at any point. We are running builds on [TravisCI](https://travis-ci.org/mobitroll/kahoot-quill) experimentally, and this will be built into the process in the future. Right now you can see the build status on pull requests.
 
 ### 4. Make a pull request to stage and merge
 
