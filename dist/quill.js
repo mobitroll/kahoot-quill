@@ -9731,7 +9731,7 @@ Toolbar = (function() {
       selector = "select" + selector;
       eventName = 'change';
     } else {
-      eventName = 'click';
+      eventName = 'mousedown';
     }
     input = this.container.querySelector(selector);
     if (input == null) {
