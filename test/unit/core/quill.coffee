@@ -178,6 +178,15 @@ describe('Quill', ->
     )
   )
 
+  describe('setValidity()', ->
+    it('changes the aria-invalid attribute', ->
+      @quill.setValidity(false)
+      expect(@quill.editor.root.getAttribute('aria-invalid')).toEqual('true')
+      @quill.setValidity(true)
+      expect(@quill.editor.root.getAttribute('aria-invalid')).toEqual('false')
+    )
+  )
+
   describe('events', ->
     it('format middle', (done) ->
       @quill.setHTML('<div><b>a</b><i>b</i><u>c</u></div>')

@@ -227,6 +227,9 @@ class Quill extends EventEmitter2
     delta = new Delta().insert(text)
     this.setContents(delta, source)
 
+  setValidity: (isValid) ->
+    @editor.setValidity(isValid)
+
   updateContents: (delta, source = Quill.sources.API) ->
     delta = { ops: delta } if Array.isArray(delta)
     @editor.applyDelta(delta, source)
