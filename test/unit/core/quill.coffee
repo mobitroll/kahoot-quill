@@ -178,12 +178,12 @@ describe('Quill', ->
     )
   )
 
-  describe('setValidity()', ->
+  describe('setAriaInvalid()', ->
     it('changes the aria-invalid attribute', ->
-      @quill.setValidity(false)
-      expect(@quill.editor.root.getAttribute('aria-invalid')).toEqual('true')
-      @quill.setValidity(true)
+      @quill.setAriaInvalid(false)
       expect(@quill.editor.root.getAttribute('aria-invalid')).toEqual('false')
+      @quill.setAriaInvalid(true)
+      expect(@quill.editor.root.getAttribute('aria-invalid')).toEqual('true')
     )
   )
 

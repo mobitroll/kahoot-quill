@@ -16,11 +16,11 @@ class Editor
     @root.setAttribute('id', @options.id)
     if @options.aria
       ariaProps = Object.keys(@options.aria)
-      i = 0
-      l = ariaProps.length
-      while i < l
-        @root.setAttribute('aria-' + ariaProps[i], @options.aria[ariaProps[i]])
-        i++
+      index = 0
+      len = ariaProps.length
+      while index < len
+        this.setAriaAttribute(ariaProps[index], @options.aria[ariaProps[index]])
+        index++
 
     @doc = new Document(@root, @options)
     @delta = @doc.toDelta()
@@ -90,8 +90,8 @@ class Editor
     else
       @root.focus()
 
-  setValidity: (isValid) ->
-    @root.setAttribute('aria-invalid', !isValid);
+  setAriaAttribute: (attribute, value) ->
+    @root.setAttribute('aria-' + attribute, value);
 
   getBounds: (index) ->
     this.checkUpdate()
