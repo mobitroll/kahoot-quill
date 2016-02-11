@@ -14,6 +14,14 @@ class Editor
 
   constructor: (@root, @quill, @options = {}) ->
     @root.setAttribute('id', @options.id)
+    if @options.aria
+      ariaProps = Object.keys(@options.aria)
+      index = 0
+      len = ariaProps.length
+      while index < len
+        this.setAriaAttribute(ariaProps[index], @options.aria[ariaProps[index]])
+        index++
+
     @doc = new Document(@root, @options)
     @delta = @doc.toDelta()
     @length = @delta.length()
@@ -81,6 +89,9 @@ class Editor
       @selection.setRange(@selection.range)
     else
       @root.focus()
+
+  setAriaAttribute: (attribute, value) ->
+    @root.setAttribute('aria-' + attribute, value);
 
   getBounds: (index) ->
     this.checkUpdate()

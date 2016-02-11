@@ -60,6 +60,10 @@
         modules: {
           toolbar: { container: '#toolbar-container' }
         },
+        aria: {
+          required:'true',
+          label: 'testable aria label'
+        },
         pollInterval: 100000
       });
       quill.on('selection-change', function(range) {

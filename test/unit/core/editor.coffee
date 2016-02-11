@@ -138,6 +138,19 @@ describe('Editor', ->
       )
     )
 
+    describe('setAriaAttribute()', ->
+      it('should add aria attributes', ->
+        expect(@editor.root.getAttribute('aria-invalid')).toBeNull()
+        expect(@editor.root.getAttribute('aria-required')).toBeNull()
+        @editor.setAriaAttribute('invalid', true)
+        expect(@editor.root.getAttribute('aria-invalid')).toEqual('true')
+        @editor.setAriaAttribute('invalid', false)
+        expect(@editor.root.getAttribute('aria-invalid')).toEqual('false')
+        @editor.setAriaAttribute('required', true)
+        expect(@editor.root.getAttribute('aria-required')).toEqual('true')
+      )
+    )
+
     describe('nonempty', ->
       tests =
         'insert in middle of text':
