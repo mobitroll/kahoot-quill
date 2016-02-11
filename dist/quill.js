@@ -5006,7 +5006,7 @@
 
 },{}],3:[function(_dereq_,module,exports){
 var diff = _dereq_('fast-diff');
-var is = _dereq_('./is');
+var equal = _dereq_('deep-equal');
 var op = _dereq_('./op');
 
 
@@ -5015,9 +5015,9 @@ var NULL_CHARACTER = String.fromCharCode(0);  // Placeholder char for embed in d
 
 var Delta = function (ops) {
   // Assume we are given a well formed ops
-  if (is.array(ops)) {
+  if (Array.isArray(ops)) {
     this.ops = ops;
-  } else if (is.object(ops) && is.array(ops.ops)) {
+  } else if (ops != null && Array.isArray(ops.ops)) {
     this.ops = ops.ops;
   } else {
     this.ops = [];
@@ -5029,7 +5029,7 @@ Delta.prototype.insert = function (text, attributes) {
   var newOp = {};
   if (text.length === 0) return this;
   newOp.insert = text;
-  if (is.object(attributes) && Object.keys(attributes).length > 0) newOp.attributes = attributes;
+  if (typeof attributes === 'object' && Object.keys(attributes).length > 0) newOp.attributes = attributes;
   return this.push(newOp);
 };
 
@@ -5041,7 +5041,7 @@ Delta.prototype['delete'] = function (length) {
 Delta.prototype.retain = function (length, attributes) {
   if (length <= 0) return this;
   var newOp = { retain: length };
-  if (is.object(attributes) && Object.keys(attributes).length > 0) newOp.attributes = attributes;
+  if (typeof attributes === 'object' && Object.keys(attributes).length > 0) newOp.attributes = attributes;
   return this.push(newOp);
 };
 
@@ -5049,29 +5049,29 @@ Delta.prototype.push = function (newOp) {
   var index = this.ops.length;
   var lastOp = this.ops[index - 1];
   newOp = op.clone(newOp);
-  if (is.object(lastOp)) {
-    if (is.number(newOp['delete']) && is.number(lastOp['delete'])) {
+  if (typeof lastOp === 'object') {
+    if (typeof newOp['delete'] === 'number' && typeof lastOp['delete'] === 'number') {
       this.ops[index - 1] = { 'delete': lastOp['delete'] + newOp['delete'] };
       return this;
     }
     // Since it does not matter if we insert before or after deleting at the same index,
     // always prefer to insert first
-    if (is.number(lastOp['delete']) && newOp.insert != null) {
+    if (typeof lastOp['delete'] === 'number' && newOp.insert != null) {
       index -= 1;
       lastOp = this.ops[index - 1];
-      if (!is.object(lastOp)) {
+      if (typeof lastOp !== 'object') {
         this.ops.unshift(newOp);
         return this;
       }
     }
-    if (is.equal(newOp.attributes, lastOp.attributes)) {
-      if (is.string(newOp.insert) && is.string(lastOp.insert)) {
+    if (equal(newOp.attributes, lastOp.attributes)) {
+      if (typeof newOp.insert === 'string' && typeof lastOp.insert === 'string') {
         this.ops[index - 1] = { insert: lastOp.insert + newOp.insert };
-        if (is.object(newOp.attributes)) this.ops[index - 1].attributes = newOp.attributes
+        if (typeof newOp.attributes === 'object') this.ops[index - 1].attributes = newOp.attributes
         return this;
-      } else if (is.number(newOp.retain) && is.number(lastOp.retain)) {
+      } else if (typeof newOp.retain === 'number' && typeof lastOp.retain === 'number') {
         this.ops[index - 1] = { retain: lastOp.retain + newOp.retain };
-        if (is.object(newOp.attributes)) this.ops[index - 1].attributes = newOp.attributes
+        if (typeof newOp.attributes === 'object') this.ops[index - 1].attributes = newOp.attributes
         return this;
       }
     }
@@ -5100,7 +5100,7 @@ Delta.prototype.length = function () {
 
 Delta.prototype.slice = function (start, end) {
   start = start || 0;
-  if (!is.number(end)) end = Infinity;
+  if (typeof end !== 'number') end = Infinity;
   var delta = new Delta();
   var iter = op.iterator(this.ops);
   var index = 0;
@@ -5131,20 +5131,20 @@ Delta.prototype.compose = function (other) {
       var length = Math.min(thisIter.peekLength(), otherIter.peekLength());
       var thisOp = thisIter.next(length);
       var otherOp = otherIter.next(length);
-      if (is.number(otherOp.retain)) {
+      if (typeof otherOp.retain === 'number') {
         var newOp = {};
-        if (is.number(thisOp.retain)) {
+        if (typeof thisOp.retain === 'number') {
           newOp.retain = length;
         } else {
           newOp.insert = thisOp.insert;
         }
         // Preserve null when composing with a retain, otherwise remove it for inserts
-        var attributes = op.attributes.compose(thisOp.attributes, otherOp.attributes, is.number(thisOp.retain));
+        var attributes = op.attributes.compose(thisOp.attributes, otherOp.attributes, typeof thisOp.retain === 'number');
         if (attributes) newOp.attributes = attributes;
         delta.push(newOp);
       // Other op should be delete, we could be an insert or retain
       // Insert + delete cancels out
-      } else if (is.number(otherOp['delete']) && is.number(thisOp.retain)) {
+      } else if (typeof otherOp['delete'] === 'number' && typeof thisOp.retain === 'number') {
         delta.push(otherOp);
       }
     }
@@ -5169,7 +5169,7 @@ Delta.prototype.diff = function (other) {
   var strings = [this.ops, other.ops].map(function (ops) {
     return ops.map(function (op) {
       if (op.insert != null) {
-        return is.string(op.insert) ? op.insert : NULL_CHARACTER;
+        return typeof op.insert === 'string' ? op.insert : NULL_CHARACTER;
       }
       var prep = (ops === other.ops) ? 'on' : 'with';
       throw new Error('diff() called ' + prep + ' non-document');
@@ -5196,7 +5196,7 @@ Delta.prototype.diff = function (other) {
           opLength = Math.min(thisIter.peekLength(), otherIter.peekLength(), length);
           var thisOp = thisIter.next(opLength);
           var otherOp = otherIter.next(opLength);
-          if (is.equal(thisOp.insert, otherOp.insert)) {
+          if (equal(thisOp.insert, otherOp.insert)) {
             delta.retain(opLength, op.attributes.diff(thisOp.attributes, otherOp.attributes));
           } else {
             delta.push(otherOp)['delete'](opLength);
@@ -5211,7 +5211,7 @@ Delta.prototype.diff = function (other) {
 
 Delta.prototype.transform = function (other, priority) {
   priority = !!priority;
-  if (is.number(other)) {
+  if (typeof other === 'number') {
     return this.transformPosition(other, priority);
   }
   var thisIter = op.iterator(this.ops);
@@ -5262,51 +5262,11 @@ Delta.prototype.transformPosition = function (index, priority) {
 
 module.exports = Delta;
 
-},{"./is":4,"./op":5,"fast-diff":6}],4:[function(_dereq_,module,exports){
-module.exports = {
-  equal: function (a, b) {
-    if (a === b) return true;
-    if (a == null && b == null) return true;
-    if (a == null || b == null) return false;
-    if (!this.object(a) || !this.object(b)) return false;
-    if (Object.keys(a).length != Object.keys(b).length) return false;
-    for(var key in a) {
-      // Only compare one level deep
-      if (a[key] !== b[key]) return false;
-    }
-    return true;
-  },
-
-  array: function (value) {
-    return Array.isArray(value);
-  },
-
-  number: function (value) {
-    if (typeof value === 'number') return true;
-    if (typeof value === 'object' && Object.prototype.toString.call(value) === '[object Number]') return true;
-    return false;
-  },
-
-  object: function (value) {
-    if (!value) return false;
-    return (typeof value === 'function' || typeof value === 'object');
-  },
-
-  string: function (value) {
-    if (typeof value === 'string') return true;
-    if (typeof value === 'object' && Object.prototype.toString.call(value) === '[object String]') return true;
-    return false;
-  }
-};
-
-},{}],5:[function(_dereq_,module,exports){
-var is = _dereq_('./is');
-
-
+},{"./op":4,"deep-equal":5,"fast-diff":8}],4:[function(_dereq_,module,exports){
 var lib = {
   attributes: {
     clone: function (attributes, keepNull) {
-      if (!is.object(attributes)) return {};
+      if (typeof attributes !== 'object') return {};
       return Object.keys(attributes).reduce(function (memo, key) {
         if (attributes[key] !== undefined && (attributes[key] !== null || keepNull)) {
           memo[key] = attributes[key];
@@ -5316,8 +5276,8 @@ var lib = {
     },
 
     compose: function (a, b, keepNull) {
-      if (!is.object(a)) a = {};
-      if (!is.object(b)) b = {};
+      if (typeof a !== 'object') a = {};
+      if (typeof b !== 'object') b = {};
       var attributes = this.clone(b, keepNull);
       for (var key in a) {
         if (a[key] !== undefined && b[key] === undefined) {
@@ -5328,8 +5288,8 @@ var lib = {
     },
 
     diff: function(a, b) {
-      if (!is.object(a)) a = {};
-      if (!is.object(b)) b = {};
+      if (typeof a !== 'object') a = {};
+      if (typeof b !== 'object') b = {};
       var attributes = Object.keys(a).concat(Object.keys(b)).reduce(function (attributes, key) {
         if (a[key] !== b[key]) {
           attributes[key] = b[key] === undefined ? null : b[key];
@@ -5340,8 +5300,8 @@ var lib = {
     },
 
     transform: function (a, b, priority) {
-      if (!is.object(a)) return b;
-      if (!is.object(b)) return undefined;
+      if (typeof a !== 'object') return b;
+      if (typeof b !== 'object') return undefined;
       if (!priority) return b;  // b simply overwrites us without priority
       var attributes = Object.keys(b).reduce(function (attributes, key) {
         if (a[key] === undefined) attributes[key] = b[key];  // null is a valid value
@@ -5353,7 +5313,7 @@ var lib = {
 
   clone: function (op) {
     var newOp = this.attributes.clone(op);
-    if (is.object(newOp.attributes)) {
+    if (typeof newOp.attributes === 'object') {
       newOp.attributes = this.attributes.clone(newOp.attributes, true);
     }
     return newOp;
@@ -5364,12 +5324,12 @@ var lib = {
   },
 
   length: function (op) {
-    if (is.number(op['delete'])) {
+    if (typeof op['delete'] === 'number') {
       return op['delete'];
-    } else if (is.number(op.retain)) {
+    } else if (typeof op.retain === 'number') {
       return op.retain;
     } else {
-      return is.string(op.insert) ? op.insert.length : 1;
+      return typeof op.insert === 'string' ? op.insert.length : 1;
     }
   }
 };
@@ -5398,16 +5358,16 @@ Iterator.prototype.next = function (length) {
     } else {
       this.offset += length;
     }
-    if (is.number(nextOp['delete'])) {
+    if (typeof nextOp['delete'] === 'number') {
       return { 'delete': length };
     } else {
       var retOp = {};
       if (nextOp.attributes) {
         retOp.attributes = nextOp.attributes;
       }
-      if (is.number(nextOp.retain)) {
+      if (typeof nextOp.retain === 'number') {
         retOp.retain = length;
-      } else if (is.string(nextOp.insert)) {
+      } else if (typeof nextOp.insert === 'string') {
         retOp.insert = nextOp.insert.substr(offset, length);
       } else {
         // offset should === 0, length should === 1
@@ -5431,9 +5391,9 @@ Iterator.prototype.peekLength = function () {
 
 Iterator.prototype.peekType = function () {
   if (this.ops[this.index]) {
-    if (is.number(this.ops[this.index]['delete'])) {
+    if (typeof this.ops[this.index]['delete'] === 'number') {
       return 'delete';
-    } else if (is.number(this.ops[this.index].retain)) {
+    } else if (typeof this.ops[this.index].retain === 'number') {
       return 'retain';
     } else {
       return 'insert';
@@ -5445,7 +5405,136 @@ Iterator.prototype.peekType = function () {
 
 module.exports = lib;
 
-},{"./is":4}],6:[function(_dereq_,module,exports){
+},{}],5:[function(_dereq_,module,exports){
+var pSlice = Array.prototype.slice;
+var objectKeys = _dereq_('./lib/keys.js');
+var isArguments = _dereq_('./lib/is_arguments.js');
+
+var deepEqual = module.exports = function (actual, expected, opts) {
+  if (!opts) opts = {};
+  // 7.1. All identical values are equivalent, as determined by ===.
+  if (actual === expected) {
+    return true;
+
+  } else if (actual instanceof Date && expected instanceof Date) {
+    return actual.getTime() === expected.getTime();
+
+  // 7.3. Other pairs that do not both pass typeof value == 'object',
+  // equivalence is determined by ==.
+  } else if (!actual || !expected || typeof actual != 'object' && typeof expected != 'object') {
+    return opts.strict ? actual === expected : actual == expected;
+
+  // 7.4. For all other Object pairs, including Array objects, equivalence is
+  // determined by having the same number of owned properties (as verified
+  // with Object.prototype.hasOwnProperty.call), the same set of keys
+  // (although not necessarily the same order), equivalent values for every
+  // corresponding key, and an identical 'prototype' property. Note: this
+  // accounts for both named and indexed properties on Arrays.
+  } else {
+    return objEquiv(actual, expected, opts);
+  }
+}
+
+function isUndefinedOrNull(value) {
+  return value === null || value === undefined;
+}
+
+function isBuffer (x) {
+  if (!x || typeof x !== 'object' || typeof x.length !== 'number') return false;
+  if (typeof x.copy !== 'function' || typeof x.slice !== 'function') {
+    return false;
+  }
+  if (x.length > 0 && typeof x[0] !== 'number') return false;
+  return true;
+}
+
+function objEquiv(a, b, opts) {
+  var i, key;
+  if (isUndefinedOrNull(a) || isUndefinedOrNull(b))
+    return false;
+  // an identical 'prototype' property.
+  if (a.prototype !== b.prototype) return false;
+  //~~~I've managed to break Object.keys through screwy arguments passing.
+  //   Converting to array solves the problem.
+  if (isArguments(a)) {
+    if (!isArguments(b)) {
+      return false;
+    }
+    a = pSlice.call(a);
+    b = pSlice.call(b);
+    return deepEqual(a, b, opts);
+  }
+  if (isBuffer(a)) {
+    if (!isBuffer(b)) {
+      return false;
+    }
+    if (a.length !== b.length) return false;
+    for (i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+  try {
+    var ka = objectKeys(a),
+        kb = objectKeys(b);
+  } catch (e) {//happens when one is a string literal and the other isn't
+    return false;
+  }
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length != kb.length)
+    return false;
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+  //~~~cheap key test
+  for (i = ka.length - 1; i >= 0; i--) {
+    if (ka[i] != kb[i])
+      return false;
+  }
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i >= 0; i--) {
+    key = ka[i];
+    if (!deepEqual(a[key], b[key], opts)) return false;
+  }
+  return typeof a === typeof b;
+}
+
+},{"./lib/is_arguments.js":6,"./lib/keys.js":7}],6:[function(_dereq_,module,exports){
+var supportsArgumentsClass = (function(){
+  return Object.prototype.toString.call(arguments)
+})() == '[object Arguments]';
+
+exports = module.exports = supportsArgumentsClass ? supported : unsupported;
+
+exports.supported = supported;
+function supported(object) {
+  return Object.prototype.toString.call(object) == '[object Arguments]';
+};
+
+exports.unsupported = unsupported;
+function unsupported(object){
+  return object &&
+    typeof object == 'object' &&
+    typeof object.length == 'number' &&
+    Object.prototype.hasOwnProperty.call(object, 'callee') &&
+    !Object.prototype.propertyIsEnumerable.call(object, 'callee') ||
+    false;
+};
+
+},{}],7:[function(_dereq_,module,exports){
+exports = module.exports = typeof Object.keys === 'function'
+  ? Object.keys : shim;
+
+exports.shim = shim;
+function shim (obj) {
+  var keys = [];
+  for (var key in obj) keys.push(key);
+  return keys;
+}
+
+},{}],8:[function(_dereq_,module,exports){
 /**
  * This library modifies the diff-patch-match library by Neil Fraser
  * by removing the patch and match functionality and certain advanced
@@ -6017,9 +6106,9 @@ diff.EQUAL = DIFF_EQUAL;
 
 module.exports = diff;
 
-},{}],7:[function(_dereq_,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 module.exports={"version":"0.20.1"}
-},{}],8:[function(_dereq_,module,exports){
+},{}],10:[function(_dereq_,module,exports){
 var Delta, Document, Format, Line, LinkedList, Normalizer, _, dom;
 
 _ = _dereq_('lodash');
@@ -6237,7 +6326,7 @@ Document = (function() {
 module.exports = Document;
 
 
-},{"../lib/dom":17,"../lib/linked-list":18,"./format":10,"./line":12,"./normalizer":13,"lodash":1,"rich-text/lib/delta":3}],9:[function(_dereq_,module,exports){
+},{"../lib/dom":19,"../lib/linked-list":20,"./format":12,"./line":14,"./normalizer":15,"lodash":1,"rich-text/lib/delta":3}],11:[function(_dereq_,module,exports){
 var Delta, Document, Editor, Line, Selection, _, dom;
 
 _ = _dereq_('lodash');
@@ -6260,10 +6349,20 @@ Editor = (function() {
   };
 
   function Editor(root, quill, options) {
+    var ariaProps, index, len;
     this.root = root;
     this.quill = quill;
     this.options = options != null ? options : {};
     this.root.setAttribute('id', this.options.id);
+    if (this.options.aria) {
+      ariaProps = Object.keys(this.options.aria);
+      index = 0;
+      len = ariaProps.length;
+      while (index < len) {
+        this.setAriaAttribute(ariaProps[index], this.options.aria[ariaProps[index]]);
+        index++;
+      }
+    }
     this.doc = new Document(this.root, this.options);
     this.delta = this.doc.toDelta();
     this.length = this.delta.length();
@@ -6364,6 +6463,10 @@ Editor = (function() {
     } else {
       return this.root.focus();
     }
+  };
+
+  Editor.prototype.setAriaAttribute = function(attribute, value) {
+    return this.root.setAttribute('aria-' + attribute, value);
   };
 
   Editor.prototype.getBounds = function(index) {
@@ -6547,7 +6650,7 @@ Editor = (function() {
 module.exports = Editor;
 
 
-},{"../lib/dom":17,"./document":8,"./line":12,"./selection":14,"lodash":1,"rich-text/lib/delta":3}],10:[function(_dereq_,module,exports){
+},{"../lib/dom":19,"./document":10,"./line":14,"./selection":16,"lodash":1,"rich-text/lib/delta":3}],12:[function(_dereq_,module,exports){
 var Format, _, dom;
 
 _ = _dereq_('lodash');
@@ -6839,7 +6942,7 @@ Format = (function() {
 module.exports = Format;
 
 
-},{"../lib/dom":17,"lodash":1}],11:[function(_dereq_,module,exports){
+},{"../lib/dom":19,"lodash":1}],13:[function(_dereq_,module,exports){
 var Format, Leaf, LinkedList, _, dom,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -6910,7 +7013,7 @@ Leaf = (function(superClass) {
 module.exports = Leaf;
 
 
-},{"../lib/dom":17,"../lib/linked-list":18,"./format":10,"lodash":1}],12:[function(_dereq_,module,exports){
+},{"../lib/dom":19,"../lib/linked-list":20,"./format":12,"lodash":1}],14:[function(_dereq_,module,exports){
 var Delta, Format, Leaf, Line, LinkedList, Normalizer, _, dom,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -7193,7 +7296,7 @@ Line = (function(superClass) {
 module.exports = Line;
 
 
-},{"../lib/dom":17,"../lib/linked-list":18,"./format":10,"./leaf":11,"./line":12,"./normalizer":13,"lodash":1,"rich-text/lib/delta":3}],13:[function(_dereq_,module,exports){
+},{"../lib/dom":19,"../lib/linked-list":20,"./format":12,"./leaf":13,"./line":14,"./normalizer":15,"lodash":1,"rich-text/lib/delta":3}],15:[function(_dereq_,module,exports){
 var Normalizer, _, camelize, dom;
 
 _ = _dereq_('lodash');
@@ -7450,7 +7553,7 @@ Normalizer = (function() {
 module.exports = Normalizer;
 
 
-},{"../lib/dom":17,"lodash":1}],14:[function(_dereq_,module,exports){
+},{"../lib/dom":19,"lodash":1}],16:[function(_dereq_,module,exports){
 var Leaf, Normalizer, Range, Selection, _, dom;
 
 _ = _dereq_('lodash');
@@ -7703,7 +7806,7 @@ Selection = (function() {
 module.exports = Selection;
 
 
-},{"../lib/dom":17,"../lib/range":20,"./leaf":11,"./normalizer":13,"lodash":1}],15:[function(_dereq_,module,exports){
+},{"../lib/dom":19,"../lib/range":22,"./leaf":13,"./normalizer":15,"lodash":1}],17:[function(_dereq_,module,exports){
 _dereq_('./modules/authorship');
 
 _dereq_('./modules/image-tooltip');
@@ -7725,7 +7828,7 @@ _dereq_('./modules/undo-manager');
 module.exports = _dereq_('./quill');
 
 
-},{"./modules/authorship":21,"./modules/image-tooltip":22,"./modules/keyboard":23,"./modules/link-tooltip":24,"./modules/multi-cursor":25,"./modules/paste-manager":26,"./modules/toolbar":27,"./modules/tooltip":28,"./modules/undo-manager":29,"./quill":30}],16:[function(_dereq_,module,exports){
+},{"./modules/authorship":23,"./modules/image-tooltip":24,"./modules/keyboard":25,"./modules/link-tooltip":26,"./modules/multi-cursor":27,"./modules/paste-manager":28,"./modules/toolbar":29,"./modules/tooltip":30,"./modules/undo-manager":31,"./quill":32}],18:[function(_dereq_,module,exports){
 var ColorPicker, Picker, dom,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -7756,7 +7859,7 @@ ColorPicker = (function(superClass) {
 module.exports = ColorPicker;
 
 
-},{"./dom":17,"./picker":19}],17:[function(_dereq_,module,exports){
+},{"./dom":19,"./picker":21}],19:[function(_dereq_,module,exports){
 var SelectWrapper, Wrapper, _, dom, lastKeyEvent,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -8444,7 +8547,7 @@ dom = _.extend(dom, {
 module.exports = dom;
 
 
-},{"lodash":1}],18:[function(_dereq_,module,exports){
+},{"lodash":1}],20:[function(_dereq_,module,exports){
 var LinkedList, Node;
 
 Node = (function() {
@@ -8535,7 +8638,7 @@ LinkedList = (function() {
 module.exports = LinkedList;
 
 
-},{}],19:[function(_dereq_,module,exports){
+},{}],21:[function(_dereq_,module,exports){
 var Picker, _, dom;
 
 _ = _dereq_('lodash');
@@ -8643,7 +8746,7 @@ Picker = (function() {
 module.exports = Picker;
 
 
-},{"./dom":17,"lodash":1}],20:[function(_dereq_,module,exports){
+},{"./dom":19,"lodash":1}],22:[function(_dereq_,module,exports){
 var Range, _;
 
 _ = _dereq_('lodash');
@@ -8696,7 +8799,7 @@ Range = (function() {
 module.exports = Range;
 
 
-},{"lodash":1}],21:[function(_dereq_,module,exports){
+},{"lodash":1}],23:[function(_dereq_,module,exports){
 var Authorship, Delta, Quill, _, dom;
 
 Quill = _dereq_('../quill');
@@ -8796,7 +8899,7 @@ Quill.registerModule('authorship', Authorship);
 module.exports = Authorship;
 
 
-},{"../quill":30}],22:[function(_dereq_,module,exports){
+},{"../quill":32}],24:[function(_dereq_,module,exports){
 var Delta, ImageTooltip, Quill, Range, Tooltip, _, dom,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -8913,7 +9016,7 @@ Quill.registerModule('image-tooltip', ImageTooltip);
 module.exports = ImageTooltip;
 
 
-},{"../quill":30,"./tooltip":28}],23:[function(_dereq_,module,exports){
+},{"../quill":32,"./tooltip":30}],25:[function(_dereq_,module,exports){
 var Delta, Keyboard, Quill, _, dom;
 
 Quill = _dereq_('../quill');
@@ -9158,7 +9261,7 @@ Quill.registerModule('keyboard', Keyboard);
 module.exports = Keyboard;
 
 
-},{"../quill":30}],24:[function(_dereq_,module,exports){
+},{"../quill":32}],26:[function(_dereq_,module,exports){
 var LinkTooltip, Quill, Tooltip, _, dom,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -9362,7 +9465,7 @@ Quill.registerModule('link-tooltip', LinkTooltip);
 module.exports = LinkTooltip;
 
 
-},{"../quill":30,"./tooltip":28}],25:[function(_dereq_,module,exports){
+},{"../quill":32,"./tooltip":30}],27:[function(_dereq_,module,exports){
 var EventEmitter2, MultiCursor, Quill, _, dom,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -9541,7 +9644,7 @@ Quill.registerModule('multi-cursor', MultiCursor);
 module.exports = MultiCursor;
 
 
-},{"../quill":30,"eventemitter2":2}],26:[function(_dereq_,module,exports){
+},{"../quill":32,"eventemitter2":2}],28:[function(_dereq_,module,exports){
 var Delta, Document, PasteManager, Quill, _, dom,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -9623,7 +9726,7 @@ Quill.registerModule('paste-manager', PasteManager);
 module.exports = PasteManager;
 
 
-},{"../core/document":8,"../quill":30}],27:[function(_dereq_,module,exports){
+},{"../core/document":10,"../quill":32}],29:[function(_dereq_,module,exports){
 var Quill, Toolbar, _, dom;
 
 Quill = _dereq_('../quill');
@@ -9914,7 +10017,7 @@ Quill.registerModule('toolbar', Toolbar);
 module.exports = Toolbar;
 
 
-},{"../quill":30}],28:[function(_dereq_,module,exports){
+},{"../quill":32}],30:[function(_dereq_,module,exports){
 var Quill, Tooltip, _, dom;
 
 Quill = _dereq_('../quill');
@@ -10013,7 +10116,7 @@ Quill.registerModule('tooltip', Tooltip);
 module.exports = Tooltip;
 
 
-},{"../quill":30}],29:[function(_dereq_,module,exports){
+},{"../quill":32}],31:[function(_dereq_,module,exports){
 var Delta, Quill, UndoManager, _;
 
 Quill = _dereq_('../quill');
@@ -10196,7 +10299,7 @@ Quill.registerModule('undo-manager', UndoManager);
 module.exports = UndoManager;
 
 
-},{"../quill":30}],30:[function(_dereq_,module,exports){
+},{"../quill":32}],32:[function(_dereq_,module,exports){
 var Delta, Document, Editor, EventEmitter2, Format, Normalizer, Quill, Range, _, dom, pkg,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty,
@@ -10584,6 +10687,10 @@ Quill = (function(superClass) {
     return this.setContents(delta, source);
   };
 
+  Quill.prototype.setAriaInvalid = function(ariaInvalidValue) {
+    return this.editor.setAriaAttribute('invalid', ariaInvalidValue);
+  };
+
   Quill.prototype.updateContents = function(delta, source) {
     if (source == null) {
       source = Quill.sources.API;
@@ -10633,9 +10740,9 @@ Quill.registerTheme('none', _dereq_('./themes/none'));
 module.exports = Quill;
 
 
-},{"../package.json":7,"./core/document":8,"./core/editor":9,"./core/format":10,"./core/normalizer":13,"./lib/dom":17,"./lib/range":20,"./themes/base":32,"./themes/none":33,"./themes/snow":34,"eventemitter2":2,"lodash":1,"rich-text/lib/delta":3}],31:[function(_dereq_,module,exports){
+},{"../package.json":9,"./core/document":10,"./core/editor":11,"./core/format":12,"./core/normalizer":15,"./lib/dom":19,"./lib/range":22,"./themes/base":34,"./themes/none":35,"./themes/snow":36,"eventemitter2":2,"lodash":1,"rich-text/lib/delta":3}],33:[function(_dereq_,module,exports){
 module.exports = ".ql-image-tooltip{padding:10px;width:300px}.ql-image-tooltip:after{clear:both;content:\"\";display:table}.ql-image-tooltip a{border:1px solid #000;box-sizing:border-box;display:inline-block;float:left;padding:5px;text-align:center;width:50%}.ql-image-tooltip img{bottom:0;left:0;margin:auto;max-height:100%;max-width:100%;position:absolute;right:0;top:0}.ql-image-tooltip .input{box-sizing:border-box;width:100%}.ql-image-tooltip .preview{margin:10px 0;position:relative;border:1px dashed #000;height:200px}.ql-image-tooltip .preview span{display:inline-block;position:absolute;text-align:center;top:40%;width:100%}.ql-link-tooltip{padding:5px 10px}.ql-link-tooltip input.input{width:170px}.ql-link-tooltip a.done,.ql-link-tooltip input.input{display:none}.ql-link-tooltip a.change{margin-right:4px}.ql-link-tooltip.editing a.done,.ql-link-tooltip.editing input.input{display:inline-block}.ql-link-tooltip.editing a.change,.ql-link-tooltip.editing a.remove,.ql-link-tooltip.editing a.url{display:none}.ql-multi-cursor{position:absolute;left:0;top:0;z-index:1000}.ql-multi-cursor .cursor{margin-left:-1px;position:absolute}.ql-multi-cursor .cursor-flag{bottom:100%;position:absolute;white-space:nowrap}.ql-multi-cursor .cursor-name{display:inline-block;color:#fff;padding:2px 8px}.ql-multi-cursor .cursor-caret{height:100%;position:absolute;width:2px}.ql-multi-cursor .cursor.hidden .cursor-flag{display:none}.ql-multi-cursor .cursor.top .cursor-flag{bottom:auto;top:100%}.ql-multi-cursor .cursor.right .cursor-flag{right:-2px}.ql-paste-manager{left:-100000px;position:absolute;top:50%}.ql-toolbar{box-sizing:border-box}.ql-tooltip{background-color:#fff;border:1px solid #000;box-sizing:border-box;position:absolute;top:0;white-space:nowrap;z-index:2000}.ql-tooltip a{cursor:pointer;text-decoration:none}.ql-container{box-sizing:border-box;cursor:text;font-family:Helvetica,Arial,sans-serif;font-size:13px;height:100%;line-height:1.42;margin:0;overflow-x:hidden;overflow-y:auto;padding:12px 15px;position:relative}.ql-editor{box-sizing:border-box;min-height:100%;outline:0;tab-size:4;white-space:pre-wrap}.ql-editor div{margin:0;padding:0}.ql-editor a{text-decoration:underline}.ql-editor b{font-weight:700}.ql-editor i{font-style:italic}.ql-editor s{text-decoration:line-through}.ql-editor u{text-decoration:underline}.ql-editor a,.ql-editor b,.ql-editor i,.ql-editor s,.ql-editor span,.ql-editor u{background-color:inherit}.ql-editor img{max-width:100%}.ql-editor blockquote,.ql-editor ol,.ql-editor ul{margin:0 0 0 2em;padding:0}.ql-editor ol{list-style-type:decimal}.ql-editor ul{list-style-type:disc}.ql-editor.ql-ie-10 br,.ql-editor.ql-ie-9 br{display:none}";
-},{}],32:[function(_dereq_,module,exports){
+},{}],34:[function(_dereq_,module,exports){
 var BaseTheme, _, baseStyles, dom;
 
 _ = _dereq_('lodash');
@@ -10689,7 +10796,7 @@ BaseTheme = (function() {
 module.exports = BaseTheme;
 
 
-},{"../../lib/dom":17,"./base.styl":31,"lodash":1}],33:[function(_dereq_,module,exports){
+},{"../../lib/dom":19,"./base.styl":33,"lodash":1}],35:[function(_dereq_,module,exports){
 var BaseTheme, dom;
 
 dom = _dereq_('../../lib/dom');
@@ -10715,7 +10822,7 @@ BaseTheme = (function() {
 module.exports = BaseTheme;
 
 
-},{"../../lib/dom":17}],34:[function(_dereq_,module,exports){
+},{"../../lib/dom":19}],36:[function(_dereq_,module,exports){
 var BaseTheme, ColorPicker, Picker, SnowTheme, _, dom,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -10810,5 +10917,5 @@ SnowTheme = (function(superClass) {
 module.exports = SnowTheme;
 
 
-},{"../../lib/color-picker":16,"../../lib/dom":17,"../../lib/picker":19,"../base":32,"lodash":1}]},{},[15])(15)
+},{"../../lib/color-picker":18,"../../lib/dom":19,"../../lib/picker":21,"../base":34,"lodash":1}]},{},[17])(17)
 });
