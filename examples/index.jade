@@ -60,6 +60,10 @@ html
           'toolbar': { container: '#formatting-container' },
           'link-tooltip': true,
           'image-tooltip': true
+        },
+        aria: {
+          'label': 'This is an accessible editor',
+          'required': 'true'
         }
       });
       editor.on('selection-change', function(range) {
