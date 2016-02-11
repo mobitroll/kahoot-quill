@@ -24,6 +24,11 @@ describe('Editing text', ->
     browser.call( -> )
   )
 
+  it('has aria-attributes applied', ->
+    expect(editor.getAttribute('aria-label')).toEqual('testable aria label')
+    expect(editor.getAttribute('aria-required')).toEqual('true')
+  )
+
   it('simple characters', ->
     text = 'The Whale'
     editor.sendKeys(text)
